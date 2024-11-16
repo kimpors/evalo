@@ -1,26 +1,21 @@
+#include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #define MAX 2048
-#define TOKEN 128
 
-static char buf[MAX];
+static char sbuf[MAX];
 
-char *gettoken(char *s, size_t lim);
+void tokenize(char *s, size_t lim);
 
 int main(void)
 {
-	char *pbuf = buf;
-	char *ps;
-
-	while (fgets(pbuf, MAX, stdin))
+	while (fgets(sbuf, MAX, stdin))
 	{
-		while ((ps = gettoken(pbuf, TOKEN)))
-		{
-			printf("token: %s\n", ps);
-			pbuf = pbuf + strlen(ps) + 1;
-		}
+		tokenize(sbuf, TOKEN);
+		show();
 	}
 
 	return 0;
@@ -36,4 +31,39 @@ char *gettoken(char *s, size_t lim)
 
 	*ps = '\0';
 	return s;
+}
+
+void tokenize(char *s, size_t lim)
+{
+	assert(s || *s);
+
+	char *ps;
+	Token *tok;
+
+	while ((ps = gettoken(s, lim)))
+	{
+		if (*s >= '0' && *s <= '9')
+		{
+			pushn(atoi(s));
+		}
+		else
+		{
+			if (signcmp(*s) < 0)
+			{
+				while ((tok = pop()))
+				{
+					pusht(tok);
+				}
+			}
+
+			pushc(*s);
+		}
+
+		s = s + strlen(ps) + 1;
+	}
+
+	while ((tok = pop()))
+	{
+		pusht(tok);
+	}
 }
