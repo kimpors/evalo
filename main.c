@@ -21,6 +21,7 @@ int main(void)
 	return 0;
 }
 
+// Return word from a line.
 char *gettoken(char *s, size_t lim)
 {
 	if (!s || *s == '\0') return NULL;
@@ -33,6 +34,8 @@ char *gettoken(char *s, size_t lim)
 	return s;
 }
 
+// Tokenize word.
+// Produce stack of tokens
 void tokenize(char *s, size_t lim)
 {
 	assert(s || *s);
