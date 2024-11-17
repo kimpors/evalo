@@ -1,4 +1,6 @@
 #pragma once
+#include <stdlib.h>
+
 #define TOKEN 	128
 #define TOKENS 	512
 
@@ -19,3 +21,4 @@ int signcmp(char sign);
 char peep(void);
 Token *pop(void);
 void show(void);
+void tokenize(char *s, size_t lim);
