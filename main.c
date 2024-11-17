@@ -1,4 +1,5 @@
 #include "token.h"
+#include "parse.h"
 #include <stdio.h>
 #include <assert.h>
 
@@ -8,10 +9,12 @@ static char sbuf[MAX];
 
 int main(void)
 {
+	Token *tok;
+
 	while (fgets(sbuf, MAX, stdin))
 	{
 		tokenize(sbuf, TOKEN);
-		show();
+		printf("res: %ld\n", evaluate(parse()));
 	}
 
 	return 0;
