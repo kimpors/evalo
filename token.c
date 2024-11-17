@@ -3,6 +3,15 @@
 #include <string.h>
 #include <assert.h>
 
+int signcmp(char a, char b);
+
+void pushn(long value);
+void pusht(Token *tok);
+
+void push_temp(char ch);
+char peep_temp(void);
+Token *pop_temp(void);
+
 // Return word from a line.
 char *gettoken(char *s, size_t lim)
 {
@@ -33,61 +42,46 @@ void tokenize(char *s, size_t lim)
 		}
 		else
 		{
-			if (signcmp(peep(), *s) > 0)
+			if (signcmp(peep_temp(), *s) > 0)
 			{
-				while ((tok = pop()))
+				while ((tok = pop_temp()))
 				{
 					pusht(tok);
 				}
 			}
 
-			pushc(*s);
+			push_temp(*s);
 		}
 
 		s = s + strlen(ps) + 1;
 	}
 
-	while ((tok = pop()))
+	while ((tok = pop_temp()))
 	{
 		pusht(tok);
 	}
 }
 
-// Compare sign priority.
-// 0 priority: '*', '/'.
-// 1 priority: '+', ''-'
-int signcmp(char a, char b)
+int sign_priority(char a)
 {
-	if (a == b) return 0;
-
-	int a1 = 0;
-	int b1 = 0;
-
 	switch (a)
 	{
 		case '+':
 		case '-':
-			a1 = 0;
-			break;
+			return 0;
+
 		case '*':
 		case '/':
-			a1 = 1;
-			break;
+			return 1;
 	}
 
-	switch (b)
-	{
-		case '+':
-		case '-':
-			b1 = 0;
-			break;
-		case '*':
-		case '/':
-			b1 = 1;
-			break;
-	}
+	return 0;
+}
 
-	return a1 - b1;
+// Compare sign priority.
+inline int signcmp(char a, char b)
+{
+	return sign_priority(a) - sign_priority(b);
 }
 
 static size_t oindex;
@@ -130,8 +124,15 @@ void pusht(Token *tok)
 	out[oindex++].data = tok->data;
 }
 
+// Pop output buffer
+Token *pop(void)
+{
+	if (oindex < 1) return NULL;
+	return &out[--oindex];
+}
+
 // Push sign to temp buffer
-void pushc(char ch)
+void push_temp(char ch)
 {
 	assert(tindex < TOKENS - 1);
 	temp[tindex].type = SIGN;
@@ -139,21 +140,15 @@ void pushc(char ch)
 }
 
 // Peep temp buffer
-char peep(void)
+char peep_temp(void)
 {
 	if (tindex < 1) return '\0';
 	return (long)temp[tindex - 1].data;
 }
 
 // Pop temp buffer
-Token *pop(void)
+Token *pop_temp(void)
 {
 	if (tindex < 1) return NULL;
 	return &temp[--tindex];
-}
-
-Token *outpop(void)
-{
-	if (oindex < 1) return NULL;
-	return &out[--oindex];
 }

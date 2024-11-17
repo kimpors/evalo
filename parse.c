@@ -9,7 +9,7 @@ Node *create(Token tok);
 Node *parse(void)
 {
 	Token *tok;
-	assert((tok = outpop()));
+	assert((tok = pop()));
 
 	if (tok->type == NUMBER)
 	{
@@ -52,5 +52,7 @@ Node *create(Token tok)
 {
 	if (index > MAX - 1) return NULL;
 	buf[index].token = tok;
+	buf[index].left = NULL;
+	buf[index].right = NULL;
 	return &buf[index++];
 }
