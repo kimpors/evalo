@@ -16,9 +16,10 @@ typedef struct {
 void pushc(char ch);
 void pushn(long value);
 void pusht(Token *tok);
-int signcmp(char sign);
+int signcmp(char a, char b);
 
 char peep(void);
+Token *outpop(void);
 Token *pop(void);
 void show(void);
 void tokenize(char *s, size_t lim);

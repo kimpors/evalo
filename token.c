@@ -33,7 +33,7 @@ void tokenize(char *s, size_t lim)
 		}
 		else
 		{
-			if (signcmp(*s) < 0)
+			if (signcmp(peep(), *s) > 0)
 			{
 				while ((tok = pop()))
 				{
@@ -56,27 +56,38 @@ void tokenize(char *s, size_t lim)
 // Compare sign priority.
 // 0 priority: '*', '/'.
 // 1 priority: '+', ''-'
-int signcmp(char sign)
+int signcmp(char a, char b)
 {
-	if (sign == peep()) return 0;
+	if (a == b) return 0;
 
-	size_t len = 4;
-	int a1 = 0, a2 = 0;
-	char table[] = { '*', '+', '/', '-'};
+	int a1 = 0;
+	int b1 = 0;
 
-	while (len-- > 0)
+	switch (a)
 	{
-		if (table[len] == sign)
-		{
-			a1 = table[len] % 2;
-		}
-		else if (table[len] == peep())
-		{
-			a2 = table[len] % 2;
-		}
+		case '+':
+		case '-':
+			a1 = 0;
+			break;
+		case '*':
+		case '/':
+			a1 = 1;
+			break;
 	}
 
-	return a1 - a2;
+	switch (b)
+	{
+		case '+':
+		case '-':
+			b1 = 0;
+			break;
+		case '*':
+		case '/':
+			b1 = 1;
+			break;
+	}
+
+	return a1 - b1;
 }
 
 static size_t oindex;
@@ -139,4 +150,10 @@ Token *pop(void)
 {
 	if (tindex < 1) return NULL;
 	return &temp[--tindex];
+}
+
+Token *outpop(void)
+{
+	if (oindex < 1) return NULL;
+	return &out[--oindex];
 }
