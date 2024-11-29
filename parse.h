@@ -8,4 +8,4 @@ typedef struct node {
 } Node;
 
 Node *parse(void);
-long evaluate(Node *root);
+double evaluate(Node *root);

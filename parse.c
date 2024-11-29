@@ -22,7 +22,7 @@ Node *parse(void)
 	return node;
 }
 
-long evaluate(Node *root)
+double evaluate(Node *root)
 {
 	if (!root) return 0;
 
@@ -31,8 +31,8 @@ long evaluate(Node *root)
 		return (long)root->token.data;
 	}
 
-	long left = evaluate(root->left);
-	long right = evaluate(root->right);
+	double left = evaluate(root->left);
+	double right = evaluate(root->right);
 
 	switch ((char)(long)root->token.data)
 	{
