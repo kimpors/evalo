@@ -5,8 +5,8 @@
 
 int signcmp(char a, char b);
 
-void pushn(long value);
 void pusht(Token *tok);
+void pushn(double value);
 
 void push_temp(char ch);
 char peep_temp(void);
@@ -38,7 +38,7 @@ void tokenize(char *s, size_t lim)
 	{
 		if (*s >= '0' && *s <= '9')
 		{
-			pushn(atoi(s));
+			pushn(atof(s));
 		}
 		else
 		{
@@ -99,21 +99,21 @@ void show(void)
 
 		if (out[i].type == SIGN)
 		{
-			printf("data: %c\n", (char)(long)out[i].data);
+			printf("data: %c\n", out[i].sign);
 		}
 		else
 		{
-			printf("data: %ld\n", (long)out[i].data);
+			printf("data: %f\n", out[i].num);
 		}
 	}
 }
 
 // Push number to output buffer
-void pushn(long value)
+void pushn(double value)
 {
 	assert(oindex < TOKENS - 1);
 	out[oindex].type = NUMBER;
-	out[oindex++].data = (void *)(long)value;
+	out[oindex++].num = value;
 }
 
 // Push token to output buffer
@@ -121,7 +121,15 @@ void pusht(Token *tok)
 {
 	assert(oindex < TOKENS - 1);
 	out[oindex].type = tok->type;
-	out[oindex++].data = tok->data;
+
+	if (tok->type == SIGN)
+	{
+		out[oindex++].sign = tok->sign;
+	}
+	else
+	{
+		out[oindex++].num = tok->num;
+	}
 }
 
 // Pop output buffer
@@ -136,14 +144,14 @@ void push_temp(char ch)
 {
 	assert(tindex < TOKENS - 1);
 	temp[tindex].type = SIGN;
-	temp[tindex++].data = (void *)(long)ch;
+	temp[tindex++].sign = ch;
 }
 
 // Peep temp buffer
 char peep_temp(void)
 {
 	if (tindex < 1) return '\0';
-	return (long)temp[tindex - 1].data;
+	return temp[tindex - 1].sign;
 }
 
 // Pop temp buffer

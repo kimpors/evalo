@@ -13,7 +13,7 @@ int main(void)
 	while (fgets(sbuf, MAX, stdin))
 	{
 		tokenize(sbuf, TOKEN);
-		printf("-> %.2f\n", evaluate(parse()));
+		printf("-> %.2f\n\n", evaluate(parse()));
 		memset(sbuf, 0, sizeof(sbuf));
 	}
 

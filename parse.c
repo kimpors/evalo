@@ -1,6 +1,7 @@
 #include "parse.h"
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 
 #define MAX 2048
 
@@ -28,18 +29,19 @@ double evaluate(Node *root)
 
 	if (root->token.type == NUMBER)
 	{
-		return (long)root->token.data;
+		return root->token.num;
 	}
 
 	double left = evaluate(root->left);
 	double right = evaluate(root->right);
 
-	switch ((char)(long)root->token.data)
+	switch (root->token.sign)
 	{
 		case '+': return left + right;
 		case '-': return right - left;
 		case '*': return left * right;
 		case '/': return right / left;
+		case '^': return pow(right, left);
 	}
 
 	return -1;

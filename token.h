@@ -9,8 +9,11 @@ typedef enum {
 } TokenType;
 
 typedef struct {
-	void *data;
 	TokenType type;
+	union {
+		char sign;
+		double num;
+	};
 } Token;
 
 void show(void);
