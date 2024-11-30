@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 
 int signcmp(char a, char b);
 
@@ -12,16 +13,25 @@ void push_temp(char ch);
 char peep_temp(void);
 Token *pop_temp(void);
 
-// Return word from a line.
-char *gettoken(char *s, size_t lim)
+char *gettoken(char *s, Token *dest, size_t lim)
 {
-	if (!s || *s == '\0') return NULL;
+	if (!s) return NULL;
 
 	while (lim-- > 0 && *s == ' ') s++;
-	char *ps = s;
-	while (lim-- > 0 && *ps != ' ') ps++;
+	if (*s == '\n' || *s == '\0') return NULL; 
 
-	*ps = '\0';
+	if (!isdigit(*s) && *s != '.')
+	{
+		dest->type = SIGN;
+		dest->sign = *s;
+		s++;
+	}
+	else
+	{
+		dest->type = NUMBER;
+		dest->num = strtod(s, &s);
+	}
+
 	return s;
 }
 
@@ -32,17 +42,18 @@ void tokenize(char *s, size_t lim)
 	assert(s || *s);
 
 	char *ps;
+	Token res;
 	Token *tok;
 
-	while ((ps = gettoken(s, lim)))
+	while ((ps = gettoken(s, &res, lim)))
 	{
-		if (*s >= '0' && *s <= '9')
+		if (res.type == NUMBER)
 		{
-			pushn(atof(s));
+			pushn(res.num);
 		}
 		else
 		{
-			if (signcmp(peep_temp(), *s) > 0)
+			if (signcmp(peep_temp(), res.sign) > 0)
 			{
 				while ((tok = pop_temp()))
 				{
@@ -50,10 +61,10 @@ void tokenize(char *s, size_t lim)
 				}
 			}
 
-			push_temp(*s);
+			push_temp(res.sign);
 		}
 
-		s = s + strlen(ps) + 1;
+		s = ps;
 	}
 
 	while ((tok = pop_temp()))
