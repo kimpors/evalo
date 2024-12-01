@@ -5,7 +5,7 @@
 #define TOKENS 	512
 
 typedef enum {
-	NUMBER, SIGN
+	NUMBER, SIGN, BRACKET
 } TokenType;
 
 typedef struct {

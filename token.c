@@ -20,7 +20,13 @@ char *gettoken(char *s, Token *dest, size_t lim)
 	while (lim-- > 0 && *s == ' ') s++;
 	if (*s == '\n' || *s == '\0') return NULL; 
 
-	if (!isdigit(*s) && *s != '.')
+	if (*s == '(' || *s == ')')
+	{
+		dest->type = BRACKET;
+		dest->sign = *s;
+		s++;
+	}
+	else if (!isdigit(*s) && *s != '.')
 	{
 		dest->type = SIGN;
 		dest->sign = *s;
@@ -50,6 +56,20 @@ void tokenize(char *s, size_t lim)
 		if (res.type == NUMBER)
 		{
 			pushn(res.num);
+		}
+		else if (res.type == BRACKET)
+		{
+			if (res.sign == '(')
+			{
+				push_temp(res.sign);
+			}
+			else if (res.sign == ')')
+			{
+				while ((tok = pop_temp()) && tok->sign != '(')
+				{
+					pusht(tok);
+				}
+			}
 		}
 		else
 		{
