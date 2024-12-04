@@ -114,6 +114,9 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+#include <windows.h>
+
+#ifdef __linux__
 void clip(double num)
 {
 	FILE *fp = popen("xclip -selection clipboard", "w");
@@ -126,6 +129,37 @@ void clip(double num)
 	fprintf(fp, isexp ? "%.*e" : "%.*f", prec, num);
 	pclose(fp);
 }
+#elif _WIN32
+void clip(double num)
+{
+	char buf[255];
+	sprintf_s(buf, sizeof(buf), "%.*f", prec, num);
+
+	if (!OpenClipboard(NULL))
+	{
+		fprintf(stderr, "Failed to open clipboard\n");
+		exit(-1);
+	}
+
+	EmptyClipboard();
+
+	size_t len = strlen(buf) + 1;
+	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+
+	if (!hMem)
+	{
+		CloseClipboard();
+		fprintf(stderr, "Failed to allocate memory\n");
+		exit(-2);
+	}
+
+	memcpy(GlobalLock(hMem), buf, len);
+	GlobalUnlock(hMem);
+
+	SetClipboardData(CF_TEXT, hMem);
+	CloseClipboard();
+}
+#endif
 
 void help(void)
 {
