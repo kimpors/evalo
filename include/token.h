@@ -6,10 +6,10 @@
 
 typedef enum {
 	NUMBER, SIGN, BRACKET
-} TypeToken;
+} TokenTypeE;
 
 typedef struct {
-	TypeToken type;
+	TokenTypeE type;
 	union {
 		char sign;
 		double num;

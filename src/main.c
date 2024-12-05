@@ -6,7 +6,6 @@
 #include <stdbool.h>
 
 #define MAX 2048
-
 static char sbuf[MAX];
 
 static bool istext = false;
@@ -61,6 +60,7 @@ int main(int argc, char *argv[])
 					return -1;
 				}
 
+				isfile = true;
 				ps = *++argv;
 				argc--;
 				break;
@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
 			default:
 				fprintf(stderr, "wrong argument: %s\n", *argv);
 				return -1;
-
 		}
 	}
 
@@ -104,9 +103,11 @@ int main(int argc, char *argv[])
 	while (fgets(sbuf, MAX, fp))
 	{
 		tokenize(sbuf, TOKEN);
+
 		printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n\n", prec, res = evaluate(parse()));
 
 		if (isclip) clip(res);
+
 		memset(sbuf, 0, sizeof(sbuf));
 	}
 
@@ -114,7 +115,6 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-#include <windows.h>
 
 #ifdef __linux__
 void clip(double num)
@@ -130,6 +130,7 @@ void clip(double num)
 	pclose(fp);
 }
 #elif _WIN32
+#include <windows.h>
 void clip(double num)
 {
 	char buf[255];
