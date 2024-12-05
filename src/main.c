@@ -1,5 +1,6 @@
 #include "token.h"
 #include "parse.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -9,12 +10,14 @@
 static char sbuf[MAX];
 
 static bool istext = false;
+static bool isverb = false;
 static bool isfile = false;
 static bool isexp = false;
 static bool isclip = false;
 static unsigned char prec = 2;
 
 void help(void);
+char *trim(char *s);
 void clip(double num);
 
 int main(int argc, char *argv[])
@@ -35,6 +38,9 @@ int main(int argc, char *argv[])
 		{
 			case 'c':
 				isclip = true;
+				break;
+			case 'v':
+				isverb = true;
 				break;
 			case 'h':
 				help();
@@ -84,6 +90,11 @@ int main(int argc, char *argv[])
 	if (istext)
 	{
 		tokenize(ps, TOKEN);
+		if (isverb)
+		{
+			printf("%s ", ps);
+		}
+
 		printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n", prec, res = evaluate(parse()));
 		if (isclip) clip(res);
 		return 0;
@@ -103,6 +114,11 @@ int main(int argc, char *argv[])
 	while (fgets(sbuf, MAX, fp))
 	{
 		tokenize(sbuf, TOKEN);
+
+		if (isverb)
+		{
+			printf("%s ", trim(sbuf));
+		}
 
 		if (isfile)
 		{
@@ -178,6 +194,7 @@ void help(void)
 	printf("\t-p [N]  \tSet precision length to N. Max length is 255\n");
 	printf("\t-f <file>\tUse file as source\n");
 	printf("\t-e\t\tSet scientific notaion\n");
+	printf("\t-v\t\tShow full equation with answer\n");
 	printf("\t-c\t\tCopy result to clipboard\n");
 	printf("\t-h, --help\tShow help message\n\n");
 
@@ -186,4 +203,17 @@ void help(void)
 	printf("\tevalo -t \"12 + 22\"\n");
 	printf("\tevalo -t 12+22\n");
 	printf("\tevalo -f text.txt\n");
+}
+
+char *trim(char *s)
+{
+	while (isblank(*s)) s++;
+
+	char *ps = s;
+	while (*ps != '\0') ps++;
+	ps--;
+	while (isblank(*ps)) ps--;
+	*ps = '\0';
+
+	return s;
 }
