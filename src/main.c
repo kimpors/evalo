@@ -104,7 +104,14 @@ int main(int argc, char *argv[])
 	{
 		tokenize(sbuf, TOKEN);
 
-		printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n\n", prec, res = evaluate(parse()));
+		if (isfile)
+		{
+			printf(isexp ? "-> %.*e\n" : "-> %.*f\n", prec, res = evaluate(parse()));
+		}
+		else
+		{
+			printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n\n", prec, res = evaluate(parse()));
+		}
 
 		if (isclip) clip(res);
 
