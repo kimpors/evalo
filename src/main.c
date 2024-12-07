@@ -1,5 +1,7 @@
 #include "token.h"
 #include "parse.h"
+#include "arg.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <assert.h>
@@ -9,92 +11,27 @@
 #define MAX 2048
 static char sbuf[MAX];
 
-static bool istext = false;
-static bool isverb = false;
-static bool isfile = false;
-static bool isexp = false;
-static bool isclip = false;
-static unsigned char prec = 2;
-
 void help(void);
 char *trim(char *s);
 void clip(double num);
 
 int main(int argc, char *argv[])
 {
-	char *ps;
+	if (arg_evaluate(argc, argv)) return -1;
+
+	if (ishelp)
+	{
+		help();
+		return 0;
+	}
+
 	double res;
 	FILE *fp = stdin;
-	unsigned char index = 1;
-
-	while (--argc > 0 && *(*++argv) == '-')
- 	{		
-		if (strcmp(*argv, "--help") == 0)
-		{
-			help();
-			return 0;
-		}
-
-		while (*++(*argv))
-		{
-			switch(**argv)
-			{
-				case 'c':
-					isclip = true;
-					break;
-				case 'v':
-					isverb = true;
-					break;
-				case 'e':
-					isexp = true;
-					break;
-				case 'h':
-					help();
-					return 0;
-				case 't':
-					if (isfile)
-					{
-						fprintf(stderr, "you can't use both -f and -t options\n");
-						return -1;
-					}
-
-					istext = true;
-					ps = argv[index++];
-					argc--;
-					break;
-				case 'f':
-					if (istext)
-					{
-						fprintf(stderr, "you can't use both -f and -t options\n");
-						return -1;
-					}
-
-					isfile = true;
-					ps = argv[index++];
-					argc--;
-					break;
-				case 'p':
-					prec = atoi(argv[index++]);
-
-					if (prec < 0)
-					{
-						fprintf(stderr, "precision can't be negative number\n");
-						prec = 2;
-					}
-
-					argc--;
-					break;
-				default:
-					fprintf(stderr, "wrong argument: %s\n", *argv);
-					return -1;
-			}
-		}
-	}
 
 	if (istext)
 	{
-		tokenize(ps, TOKEN);
-		if (isverb) printf("%s ", ps);
+		tokenize(arg_text, TOKEN);
+		if (isverb) printf("%s ", arg_text);
 		printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n", prec, res = evaluate(parse()));
 		if (isclip) clip(res);
 		return 0;
@@ -102,9 +39,9 @@ int main(int argc, char *argv[])
 
 	if (isfile)
 	{
-		if (!(fp = fopen(ps, "r")))
+		if (!(fp = fopen(arg_text, "r")))
 		{
-			fprintf(stderr, "can't open file: %s\n", ps);
+			fprintf(stderr, "can't open file: %s\n", arg_text);
 			exit(-1);
 		}
 	}
