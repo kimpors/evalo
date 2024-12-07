@@ -25,8 +25,9 @@ int main(int argc, char *argv[])
 	char *ps;
 	double res;
 	FILE *fp = stdin;
+	unsigned char index = 1;
 
-	while (--argc > 0 && (*++argv)[0] == '-')
+	while (--argc > 0 && *(*++argv) == '-')
  	{		
 		if (strcmp(*argv, "--help") == 0)
 		{
@@ -34,67 +35,66 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 
-		switch((*argv)[1])
+		while (*++(*argv))
 		{
-			case 'c':
-				isclip = true;
-				break;
-			case 'v':
-				isverb = true;
-				break;
-			case 'h':
-				help();
-				return 0;
-			case 'e':
-				isexp = true;
-				break;
-			case 't':
-				if (isfile)
-				{
-					fprintf(stderr, "you can't use both -f and -t options\n");
+			switch(**argv)
+			{
+				case 'c':
+					isclip = true;
+					break;
+				case 'v':
+					isverb = true;
+					break;
+				case 'e':
+					isexp = true;
+					break;
+				case 'h':
+					help();
+					return 0;
+				case 't':
+					if (isfile)
+					{
+						fprintf(stderr, "you can't use both -f and -t options\n");
+						return -1;
+					}
+
+					istext = true;
+					ps = argv[index++];
+					argc--;
+					break;
+				case 'f':
+					if (istext)
+					{
+						fprintf(stderr, "you can't use both -f and -t options\n");
+						return -1;
+					}
+
+					isfile = true;
+					ps = argv[index++];
+					argc--;
+					break;
+				case 'p':
+					prec = atoi(argv[index++]);
+
+					if (prec < 0)
+					{
+						fprintf(stderr, "precision can't be negative number\n");
+						prec = 2;
+					}
+
+					argc--;
+					break;
+				default:
+					fprintf(stderr, "wrong argument: %s\n", *argv);
 					return -1;
-				}
-
-				istext = true;
-				ps = *++argv;
-				argc--;
-				break;
-			case 'f':
-				if (istext)
-				{
-					fprintf(stderr, "you can't use both -f and -t options\n");
-					return -1;
-				}
-
-				isfile = true;
-				ps = *++argv;
-				argc--;
-				break;
-			case 'p':
-				prec = atoi(*++argv);
-
-				if (prec < 0)
-				{
-					fprintf(stderr, "precision can't be negative number\n");
-					prec = 2;
-				}
-
-				argc--;
-				break;
-			default:
-				fprintf(stderr, "wrong argument: %s\n", *argv);
-				return -1;
+			}
 		}
 	}
 
 	if (istext)
 	{
 		tokenize(ps, TOKEN);
-		if (isverb)
-		{
-			printf("%s ", ps);
-		}
-
+		if (isverb) printf("%s ", ps);
 		printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n", prec, res = evaluate(parse()));
 		if (isclip) clip(res);
 		return 0;
@@ -102,9 +102,7 @@ int main(int argc, char *argv[])
 
 	if (isfile)
 	{
-		fp = fopen(ps, "r");
-
-		if (!fp)
+		if (!(fp = fopen(ps, "r")))
 		{
 			fprintf(stderr, "can't open file: %s\n", ps);
 			exit(-1);
@@ -115,10 +113,7 @@ int main(int argc, char *argv[])
 	{
 		tokenize(sbuf, TOKEN);
 
-		if (isverb)
-		{
-			printf("%s ", trim(sbuf));
-		}
+		if (isverb) printf("%s ", trim(sbuf));
 
 		if (isfile)
 		{
@@ -130,7 +125,6 @@ int main(int argc, char *argv[])
 		}
 
 		if (isclip) clip(res);
-
 		memset(sbuf, 0, sizeof(sbuf));
 	}
 
@@ -203,6 +197,8 @@ void help(void)
 	printf("\tevalo -t \"12 + 22\"\n");
 	printf("\tevalo -t 12+22\n");
 	printf("\tevalo -f text.txt\n");
+	printf("\tevalo -vcfp text.txt 12\n");
+	printf("\tevalo -ecpt 12 \"12 + 22\"\n");
 }
 
 char *trim(char *s)
