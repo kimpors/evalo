@@ -1,8 +1,8 @@
 #include "token.h"
 #include "parse.h"
+#include "format.h"
 #include "arg.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -31,8 +31,7 @@ int main(int argc, char *argv[])
 	if (istext)
 	{
 		tokenize(arg_text, TOKEN);
-		if (isverb) printf("%s ", arg_text);
-		printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n", prec, res = evaluate(parse()));
+		printf("%s", format_eval(res = evaluate(parse())));
 		if (isclip) clip(res);
 		return 0;
 	}
@@ -49,18 +48,7 @@ int main(int argc, char *argv[])
 	while (fgets(sbuf, MAX, fp))
 	{
 		tokenize(sbuf, TOKEN);
-
-		if (isverb) printf("%s ", trim(sbuf));
-
-		if (isfile)
-		{
-			printf(isexp ? "-> %.*e\n" : "-> %.*f\n", prec, res = evaluate(parse()));
-		}
-		else
-		{
-			printf(isexp ? "-> %.*e\n\n" : "-> %.*f\n\n", prec, res = evaluate(parse()));
-		}
-
+		printf("%s\n", format_eval(res = evaluate(parse())));
 		if (isclip) clip(res);
 		memset(sbuf, 0, sizeof(sbuf));
 	}
@@ -138,15 +126,3 @@ void help(void)
 	printf("\tevalo -ecpt 12 \"12 + 22\"\n");
 }
 
-char *trim(char *s)
-{
-	while (isblank(*s)) s++;
-
-	char *ps = s;
-	while (*ps != '\0') ps++;
-	ps--;
-	while (isblank(*ps)) ps--;
-	*ps = '\0';
-
-	return s;
-}
