@@ -99,6 +99,13 @@ int tokenize(char *s, size_t lim)
 		}
 		else if (res.type == WORD)
 		{
+			if (strcmp(res.word, "quit\n") == 0 ||
+				strcmp(res.word, "q\n") == 0 ||
+				strcmp(res.word, "exit\n") == 0 )
+			{
+				exit(-1);
+			}
+
 			fprintf(stderr, "format error: can't parse text: %s\n", res.word);
 			clear();
 			return -1;
