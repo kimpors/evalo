@@ -8,6 +8,6 @@ extern bool isclip;
 extern bool isexp;
 
 extern char *arg_text;
-extern unsigned char prec;
+extern signed char prec;
 
 int arg_evaluate(int argc, char *argv[]);

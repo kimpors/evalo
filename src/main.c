@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX 2048
+#define MAX 1024
 static char sbuf[MAX];
 
 void help(void);
@@ -25,12 +25,12 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	double res;
+	long double res;
 	FILE *fp = stdin;
 
 	if (istext)
 	{
-		tokenize(arg_text, TOKEN);
+		if (tokenize(arg_text, TOKEN)) return -2;
 		printf("%s", format_eval(res = evaluate(parse())));
 		if (isclip) clip(res);
 		return 0;
@@ -47,9 +47,11 @@ int main(int argc, char *argv[])
 
 	while (fgets(sbuf, MAX, fp))
 	{
-		tokenize(sbuf, TOKEN);
-		printf("%s\n", format_eval(res = evaluate(parse())));
-		if (isclip) clip(res);
+		if (!tokenize(sbuf, TOKEN))
+		{
+			printf("%s\n", format_eval(res = evaluate(parse())));
+			if (isclip) clip(res);
+		}
 		memset(sbuf, 0, sizeof(sbuf));
 	}
 
@@ -110,7 +112,7 @@ void help(void)
 
 	printf("Options:\n");
 	printf("\t-t [EXP]\tUse EXP from args\n");
-	printf("\t-p [N]  \tSet precision length to N. Max length is 255\n");
+	printf("\t-p [N]  \tSet precision length to N. Max length is 127\n");
 	printf("\t-f <file>\tUse file as source\n");
 	printf("\t-e\t\tSet scientific notaion\n");
 	printf("\t-v\t\tShow full equation with answer\n");

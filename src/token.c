@@ -8,10 +8,12 @@ int signcmp(char a, char b);
 
 void pusht(Token *tok);
 void pushn(double value);
+void clear(void);
 
 void push_temp(char ch);
 char peep_temp(void);
 Token *pop_temp(void);
+int check_sign(char a);
 
 char *gettoken(char *s, Token *dest, size_t lim)
 {
@@ -26,16 +28,22 @@ char *gettoken(char *s, Token *dest, size_t lim)
 		dest->sign = *s;
 		s++;
 	}
-	else if (!isdigit(*s) && *s != '.')
+	else if (isdigit(*s))
 	{
-		dest->type = SIGN;
-		dest->sign = *s;
+		dest->type = NUMBER;
+		dest->num = strtod(s, &s);
+	}
+	else if (check_sign(*s))
+	{
+		dest->type = WORD;
+		strcpy(dest->word, s);
 		s++;
 	}
 	else
 	{
-		dest->type = NUMBER;
-		dest->num = strtod(s, &s);
+		dest->type = SIGN;
+		dest->sign = *s;
+		s++;
 	}
 
 	return s;
@@ -43,22 +51,38 @@ char *gettoken(char *s, Token *dest, size_t lim)
 
 // Tokenize word.
 // Produce stack of tokens
-void tokenize(char *s, size_t lim)
+int tokenize(char *s, size_t lim)
 {
 	assert(s || *s);
 
 	char *ps;
 	Token res;
 	Token *tok;
+	Token prev;
 
 	while ((ps = gettoken(s, &res, lim)))
 	{
 		if (res.type == NUMBER)
 		{
+			if (prev.type == NUMBER)
+			{
+				fprintf(stderr, "format error: '%.2f' can't be after '%.2f'\n", res.num, prev.num);
+				clear();
+				return -1;
+			}
+
 			pushn(res.num);
+			prev = res;
 		}
 		else if (res.type == BRACKET)
 		{
+			if (prev.type == NUMBER && res.sign == '(')
+			{
+				fprintf(stderr, "format error: '%c' can't be after '%.2f'\n", res.sign, prev.num);
+				clear();
+				return -1;
+			}
+
 			if (res.sign == '(')
 			{
 				push_temp(res.sign);
@@ -70,9 +94,24 @@ void tokenize(char *s, size_t lim)
 					pusht(tok);
 				}
 			}
+
+			prev = res;
+		}
+		else if (res.type == WORD)
+		{
+			fprintf(stderr, "format error: can't parse text: %s\n", res.word);
+			clear();
+			return -1;
 		}
 		else
 		{
+			if (prev.type == SIGN)
+			{
+				fprintf(stderr, "format error: '%c' can't be after '%c'\n", res.sign, prev.sign);
+				clear();
+				return -1;
+			}
+
 			if (signcmp(peep_temp(), res.sign) > 0)
 			{
 				while ((tok = pop_temp()))
@@ -82,6 +121,7 @@ void tokenize(char *s, size_t lim)
 			}
 
 			push_temp(res.sign);
+			prev = res;
 		}
 
 		s = ps;
@@ -91,6 +131,21 @@ void tokenize(char *s, size_t lim)
 	{
 		pusht(tok);
 	}
+
+	return 0;
+}
+
+int check_sign(char a)
+{
+	switch(a)
+	{
+		case '+': case '-':
+		case '*': case '/':
+		case '^':
+			return 0;
+	}
+
+	return -1;
 }
 
 int sign_priority(char a)
@@ -163,13 +218,6 @@ void pusht(Token *tok)
 	}
 }
 
-// Pop output buffer
-Token *pop(void)
-{
-	if (oindex < 1) return NULL;
-	return &out[--oindex];
-}
-
 // Push sign to temp buffer
 void push_temp(char ch)
 {
@@ -185,9 +233,23 @@ char peep_temp(void)
 	return temp[tindex - 1].sign;
 }
 
+// Pop output buffer
+Token *pop(void)
+{
+	if (oindex < 1) return NULL;
+	return &out[--oindex];
+}
+
 // Pop temp buffer
 Token *pop_temp(void)
 {
 	if (tindex < 1) return NULL;
 	return &temp[--tindex];
+}
+
+// Clear all buffers
+inline void clear(void)
+{
+	while (pop());
+	while (pop_temp());
 }

@@ -12,7 +12,7 @@ bool isclip = false;
 bool isexp = false;
 
 char *arg_text = NULL;
-unsigned char prec = 2;
+signed char prec = 2;
 
 int arg_evaluate(int argc, char *argv[])
 {
@@ -45,7 +45,13 @@ int arg_evaluate(int argc, char *argv[])
 				case 't':
 					if (isfile)
 					{
-						fprintf(stderr, "you can't use both -f and -t options\n");
+						fprintf(stderr, "argument error: you can't use both -f and -t options\n");
+						return -1;
+					}
+
+					if (!argv[index])
+					{
+						fprintf(stderr, "argument erro: empty arg\n");
 						return -1;
 					}
 
@@ -56,7 +62,13 @@ int arg_evaluate(int argc, char *argv[])
 				case 'f':
 					if (istext)
 					{
-						fprintf(stderr, "you can't use both -f and -t options\n");
+						fprintf(stderr, "argument error: you can't use both -f and -t options\n");
+						return -1;
+					}
+
+					if (!argv[index])
+					{
+						fprintf(stderr, "argument erro: empty arg\n");
 						return -1;
 					}
 
@@ -65,18 +77,31 @@ int arg_evaluate(int argc, char *argv[])
 					argc--;
 					break;
 				case 'p':
-					prec = atoi(argv[index++]);
+					if (!argv[index])
+					{
+						fprintf(stderr, "argument erro: empty arg\n");
+						return -1;
+					}
+
+					prec = atoi(argv[index]);
+
+					if (prec == 0 && (*argv[index] <= '0' || *argv[index] >= '9'))
+					{
+						fprintf(stderr, "argument error: not a number: %s\n", argv[index]);
+						return -1;
+					}
 
 					if (prec < 0)
 					{
-						fprintf(stderr, "precision can't be negative number\n");
-						prec = 2;
+						fprintf(stderr, "argument error: precision can't be negative number: %s\n", argv[index]);
+						return -1;
 					}
 
+					index++;
 					argc--;
 					break;
 				default:
-					fprintf(stderr, "wrong argument: %s\n", *argv);
+					fprintf(stderr, "argument error: wrong argument: %c\n", **argv);
 					return -1;
 			}
 		}

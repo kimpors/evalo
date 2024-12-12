@@ -5,7 +5,7 @@
 #define TOKENS 	512
 
 typedef enum {
-	NUMBER, SIGN, BRACKET
+	WORD, NUMBER, SIGN, BRACKET
 } TokenTypeE;
 
 typedef struct {
@@ -13,9 +13,10 @@ typedef struct {
 	union {
 		char sign;
 		double num;
+		char word[TOKEN];
 	};
 } Token;
 
 void show(void);
 Token *pop(void);
-void tokenize(char *s, size_t lim);
+int tokenize(char *s, size_t lim);
