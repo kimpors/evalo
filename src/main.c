@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX 1024
+#define MAX 2048
 static char sbuf[MAX];
 
 void help(void);

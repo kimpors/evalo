@@ -57,8 +57,8 @@ int tokenize(char *s, size_t lim)
 
 	char *ps;
 	Token res;
-	Token *tok;
-	Token prev;
+	Token *tok = NULL;
+	Token prev = {0};
 
 	while ((ps = gettoken(s, &res, lim)))
 	{
