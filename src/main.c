@@ -8,6 +8,11 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <winnt.h>
+#endif
+
 #define MAX 2048
 static char sbuf[MAX];
 

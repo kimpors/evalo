@@ -5,9 +5,20 @@ set(CMAKE_C_FLAGS_RELEASE "-O3")
 set(C_STANDARD 23)
 
 add_executable(${PROJECT_NAME} src/main.c src/token.c src/parse.c src/arg.c src/format.c)
+
+if (CMAKE_SYSTEM MATCHES Windows)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+endif()
+
+if (CMAKE_SYSTEM MATCHES Linux)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Wuninitialized)
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+
+if (CMAKE_SYSTEM MATCHES Linux)
 target_link_libraries(${PROJECT_NAME} m)
+endif()
 
 include(CTest)
 enable_testing()
@@ -25,7 +36,10 @@ add_test(NAME Args7 COMMAND test_arg "-ecpth" "12" "12+22")
 
 add_executable(test_eval test/test_eval.c src/token.c src/parse.c)
 target_include_directories(test_eval PUBLIC include)
+
+if (CMAKE_SYSTEM MATCHES Linux)
 target_link_libraries(test_eval m)
+endif()
 
 add_test(NAME Eval1 COMMAND test_eval "2 + 2" "4")
 add_test(NAME Eval2 COMMAND test_eval "1.2 + 1.3" "2.5")
@@ -52,7 +66,10 @@ add_test(NAME Eval17 COMMAND test_eval "2*((120/2)+(3^3))*2" "348")
 
 add_executable(test_format test/test_format.c src/format.c src/arg.c src/token.c src/parse.c)
 target_include_directories(test_format PUBLIC include)
+
+if (CMAKE_SYSTEM MATCHES Linux)
 target_link_libraries(test_format m)
+endif()
 
 add_test(NAME Format1 COMMAND test_format "-t" "1+1" "-> 2.00\n")
 add_test(NAME Format2 COMMAND test_format "-te" "1+1" "-> 2.00e+00\n")

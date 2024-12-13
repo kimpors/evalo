@@ -35,7 +35,7 @@ char *gettoken(char *s, Token *dest, size_t lim)
 	}
 	else if (check_sign(*s))
 	{
-		dest->type = WORD;
+		dest->type = NONE;
 		strcpy(dest->word, s);
 		s++;
 	}
@@ -97,7 +97,7 @@ int tokenize(char *s, size_t lim)
 
 			prev = res;
 		}
-		else if (res.type == WORD)
+		else if (res.type == NONE)
 		{
 			if (strcmp(res.word, "quit\n") == 0 ||
 				strcmp(res.word, "q\n") == 0 ||
