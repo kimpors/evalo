@@ -15,6 +15,9 @@ evalo -t 12+22
 ```
 evalo -f file.txt
 ```
+```
+evalo --help
+```
 
 ## How Build
 
