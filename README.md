@@ -26,6 +26,12 @@ Copy repo somewhere, then paste this command:
 ```
 cmake -B build && cmkae --build build
 ```
+
+## How Install
+
+```
+cmake -B build && cmake --build build && sudo cmake --install build
+```
   
 ## Contribution
 

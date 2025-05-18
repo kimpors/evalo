@@ -20,6 +20,8 @@ if (CMAKE_SYSTEM MATCHES Linux)
 target_link_libraries(${PROJECT_NAME} m)
 endif()
 
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
 include(CTest)
 enable_testing()
 
