@@ -7,7 +7,7 @@ static char sbuf[LEN];
 
 char *trim(char *s);
 
-char *format_eval(double val)
+char *format(double val)
 {
 	if (isverb) sprintf(sbuf, isexp ? "%s -> %.*e\n" : "%s -> %.*f\n", arg_text, prec, val);
 	else sprintf(sbuf, isexp ? "-> %.*e\n" : "-> %.*f\n", prec, val);

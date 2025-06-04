@@ -1,1 +1,1 @@
-char *format_eval(double val);
+char *format(double val);

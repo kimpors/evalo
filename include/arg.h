@@ -10,4 +10,6 @@ extern bool isexp;
 extern char *arg_text;
 extern signed char prec;
 
+void help(void);
+void clip(double num);
 int arg_evaluate(int argc, char *argv[]);

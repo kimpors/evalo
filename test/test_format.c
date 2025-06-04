@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 	if (arg_evaluate(argc - 1, argv)) return -1;
 	tokenize(arg_text, TOKEN);
 	char *arg = argv[argc - 1];
-	char *eval = format_eval(evaluate(parse()));
+	char *eval = format(evaluate(parse()));
 
 	printf("arg: %s\n", arg);
 	printf("eval: %s\n", eval);

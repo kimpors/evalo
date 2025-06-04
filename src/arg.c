@@ -14,6 +14,28 @@ bool isexp = false;
 char *arg_text = NULL;
 signed char prec = 2;
 
+void help(void)
+{
+	printf("Usage:\n\tevalo [args?]\n\n");
+
+	printf("Options:\n");
+	printf("\t-t [EXP]\tUse EXP from args\n");
+	printf("\t-p [N]  \tSet precision length to N. Max length is 127\n");
+	printf("\t-f <file>\tUse file as source\n");
+	printf("\t-e\t\tSet scientific notaion\n");
+	printf("\t-v\t\tShow full equation with answer\n");
+	printf("\t-c\t\tCopy result to clipboard\n");
+	printf("\t-h, --help\tShow help message\n\n");
+
+	printf("Examples:\n");
+	printf("\tevalo\n");
+	printf("\tevalo -t \"12 + 22\"\n");
+	printf("\tevalo -t 12+22\n");
+	printf("\tevalo -f text.txt\n");
+	printf("\tevalo -vcfp text.txt 12\n");
+	printf("\tevalo -ecpt 12 \"12 + 22\"\n");
+}
+
 int arg_evaluate(int argc, char *argv[])
 {
 	unsigned char index = 1;
@@ -109,3 +131,49 @@ int arg_evaluate(int argc, char *argv[])
 
 	return 0;
 }
+
+#ifdef __linux__
+void clip(double num)
+{
+	FILE *fp = popen("xclip -selection clipboard", "w");
+	if (!fp)
+	{
+		fprintf(stderr, "failed to open xlip\n");
+		return;
+	}
+
+	fprintf(fp, isexp ? "%.*e" : "%.*f", prec, num);
+	pclose(fp);
+}
+#elif _WIN32
+#include <windows.h>
+void clip(double num)
+{
+	char buf[255];
+	sprintf_s(buf, sizeof(buf), "%.*f", prec, num);
+
+	if (!OpenClipboard(NULL))
+	{
+		fprintf(stderr, "Failed to open clipboard\n");
+		exit(-1);
+	}
+
+	EmptyClipboard();
+
+	size_t len = strlen(buf) + 1;
+	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+
+	if (!hMem)
+	{
+		CloseClipboard();
+		fprintf(stderr, "Failed to allocate memory\n");
+		exit(-2);
+	}
+
+	memcpy(GlobalLock(hMem), buf, len);
+	GlobalUnlock(hMem);
+
+	SetClipboardData(CF_TEXT, hMem);
+	CloseClipboard();
+}
+#endif
