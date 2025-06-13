@@ -16,8 +16,6 @@
 #define MAX 2048
 static char sbuf[MAX];
 
-//extern char *arg_text;
-
 int main(int argc, char *argv[])
 {
 	char *value;

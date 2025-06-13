@@ -10,7 +10,7 @@ Evalo supports linux and windows (maybe mac, i'm not test it ^-^).
 ## Examples
 
 ```
-evalo -t 12+22
+evalo 12+22
 ```
 ```
 evalo -f file.txt
@@ -24,13 +24,13 @@ evalo --help
 For build you need install cmake.  
 Copy repo somewhere, then paste this command:  
 ```
-cmake -B build && cmkae --build build
+cmake -B build && cmake --build build
 ```
 
 ## How Install
 
 ```
-cmake -B build && cmake --build build && sudo cmake --install build
+cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build && sudo cmake --install build
 ```
   
 ## Contribution

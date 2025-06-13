@@ -14,13 +14,13 @@ char *argeval(int argc, char *argv[])
 	char *buf;
 	unsigned char index = 0;
 
-	if (strcmp(*argv, "--help") == 0)
+	if (strcmp(*++argv, "--help") == 0)
 	{
 		flags |= IS_HELP;
 		return NULL;
 	}
 
-	while (--argc > 0 && *(*++argv) == '-')
+	while (--argc > 0 && **argv == '-')
  	{		
 		while (*++(*argv))
 		{
@@ -87,10 +87,9 @@ char *argeval(int argc, char *argv[])
 
 void help(void)
 {
-	printf("Usage:\n\tevalo [args?]\n\n");
+	printf("Usage:\n\tevalo [args?] [exp?]\n\n");
 
 	printf("Options:\n");
-	printf("\t-t [EXP]\tUse EXP from args\n");
 	printf("\t-p [N]  \tSet precision length to N. Max length is 127\n");
 	printf("\t-f <file>\tUse file as source\n");
 	printf("\t-e\t\tSet scientific notaion\n");
@@ -100,11 +99,11 @@ void help(void)
 
 	printf("Examples:\n");
 	printf("\tevalo\n");
-	printf("\tevalo -t \"12 + 22\"\n");
-	printf("\tevalo -t 12+22\n");
+	printf("\tevalo \"12 + 22\"\n");
+	printf("\tevalo 12+22\n");
 	printf("\tevalo -f text.txt\n");
 	printf("\tevalo -vcfp text.txt 12\n");
-	printf("\tevalo -ecpt 12 \"12 + 22\"\n");
+	printf("\tevalo -ecp 12 \"12 + 22\"\n");
 }
 
 #ifdef __linux__
