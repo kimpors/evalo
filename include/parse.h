@@ -1,6 +1,6 @@
 #pragma once
 #include "token.h"
-#define TOKEN_MAX 512
+#define NODE_MAX 512
 
 typedef struct node {
 	Token token;

@@ -4,9 +4,7 @@
 #include "arg.h"
 
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
-#include <stdbool.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -18,11 +16,11 @@ static char sbuf[MAX];
 
 int main(int argc, char *argv[])
 {
-	char *value;
+	char *expr;
 	FILE *fp = stdin;
 	long double res;
 
-	if ((value = argeval(argc, argv)) == NULL && flags & IS_ERROR) return -1;
+	if ((expr = argeval(argc, argv)) == NULL && flags & IS_ERROR) return -1;
 
 	if (flags & IS_HELP)
 	{
@@ -32,26 +30,26 @@ int main(int argc, char *argv[])
 
 	if (flags & IS_TEXT)
 	{
-		if (tokenize(value, TOKEN)) return -2;
-		printf("%s", format(res = eval(parse())));
+		if (tokenize(expr, TOKEN_MAX)) return -1;
+		eprintf(res = eval(parse()));
 		if (flags & IS_CLIP) clip(res);
 		return 0;
 	}
 
 	if (flags & IS_FILE)
 	{
-		if (!(fp = fopen(value, "r")))
+		if (!(fp = fopen(expr, "r")))
 		{
-			fprintf(stderr, "can't open file: %s\n", value);
+			fprintf(stderr, "can't open file: %s\n", expr);
 			exit(-1);
 		}
 	}
 
 	while (fgets(sbuf, MAX, fp))
 	{
-		if (!tokenize(sbuf, TOKEN))
+		if (!tokenize(sbuf, TOKEN_MAX))
 		{
-			printf("%s\n", format(res = eval(parse())));
+			eprintf(res = eval(parse()));
 			if (flags & IS_CLIP) clip(res);
 		}
 

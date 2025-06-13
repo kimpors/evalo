@@ -178,33 +178,15 @@ inline int signcmp(char a, char b)
 }
 
 static size_t oindex;
-static Token out[TOKENS];
+static Token out[TOKEN_MAX];
 
 static size_t tindex;
-static Token temp[TOKENS];
-
-// Show debug information
-void show(void)
-{
-	for (size_t i = 0; i < oindex; i++)
-	{
-		printf("type: %s\n", out[i].type == SIGN ? "sign" : "number");
-
-		if (out[i].type == SIGN)
-		{
-			printf("data: %c\n", out[i].sign);
-		}
-		else
-		{
-			printf("data: %f\n", out[i].num);
-		}
-	}
-}
+static Token temp[TOKEN_MAX];
 
 // Push number to output buffer
 void pushn(double value)
 {
-	assert(oindex < TOKENS - 1);
+	assert(oindex < TOKEN_MAX - 1);
 	out[oindex].type = NUMBER;
 	out[oindex++].num = value;
 }
@@ -212,7 +194,7 @@ void pushn(double value)
 // Push token to output buffer
 void pusht(Token *tok)
 {
-	assert(oindex < TOKENS - 1);
+	assert(oindex < TOKEN_MAX - 1);
 	out[oindex].type = tok->type;
 
 	if (tok->type == SIGN)
@@ -228,7 +210,7 @@ void pusht(Token *tok)
 // Push sign to temp buffer
 void push_temp(char ch)
 {
-	assert(tindex < TOKENS - 1);
+	assert(tindex < TOKEN_MAX - 1);
 	temp[tindex].type = SIGN;
 	temp[tindex++].sign = ch;
 }

@@ -8,13 +8,14 @@
 
 unsigned flags;
 signed char prec = 2;
+// static char *buf = NULL;
 
 char *argeval(int argc, char *argv[])
 {
-	char *buf;
+	char *buf = NULL;
 	unsigned char index = 0;
 
-	if (strcmp(*++argv, "--help") == 0)
+	if (argc > 1 && strcmp(*++argv, "--help") == 0)
 	{
 		flags |= IS_HELP;
 		return NULL;

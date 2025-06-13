@@ -1,8 +1,8 @@
 #pragma once
 #include <stdlib.h>
 
-#define TOKEN 	128
-#define TOKENS 	512
+#define WORD_MAX 	32
+#define TOKEN_MAX 	512
 
 typedef enum {
 	NONE, NUMBER, SIGN, BRACKET
@@ -13,10 +13,9 @@ typedef struct {
 	union {
 		char sign;
 		double num;
-		char word[TOKEN];
+		char word[WORD_MAX];
 	};
 } Token;
 
-void show(void);
 Token *pop(void);
 int tokenize(char *s, size_t lim);

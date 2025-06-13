@@ -46,11 +46,11 @@ double eval(Node *root)
 }
 
 static size_t index;
-static Node buf[TOKEN_MAX];
+static Node buf[NODE_MAX];
 
 Node *create(Token tok)
 {
-	if (index > TOKEN_MAX - 1) return NULL;
+	if (index > NODE_MAX - 1) return NULL;
 
 	buf[index].token = tok;
 	buf[index].left = NULL;
