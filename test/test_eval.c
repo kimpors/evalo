@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	tokenize(argv[1], TOKEN);
+	tokenize(argv[1], TOKEN_MAX);
 	double res = eval(parse());
 	double arg = atof(argv[2]);
 

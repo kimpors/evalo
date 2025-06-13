@@ -3,5 +3,5 @@
 
 int main(int argc, char *argv[])
 {
-	return argeval(argc, argv) == NULL;
+	return (argeval(argc, argv) == NULL && (flags & IS_ERROR) != 0);
 }
