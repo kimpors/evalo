@@ -1,5 +1,6 @@
 #pragma once
 #include "token.h"
+#define TOKEN_MAX 512
 
 typedef struct node {
 	Token token;
@@ -8,4 +9,4 @@ typedef struct node {
 } Node;
 
 Node *parse(void);
-double evaluate(Node *root);
+double eval(Node *root);

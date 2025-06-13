@@ -9,8 +9,8 @@ char *trim(char *s);
 
 char *format(double val)
 {
-	if (isverb) sprintf(sbuf, isexp ? "%s -> %.*e\n" : "%s -> %.*f\n", arg_text, prec, val);
-	else sprintf(sbuf, isexp ? "-> %.*e\n" : "-> %.*f\n", prec, val);
+	//if (flags & IS_VERB) sprintf(sbuf, flags & IS_EXP ? "%s -> %.*e\n" : "%s -> %.*f\n", arg_text, prec, val);
+	sprintf(sbuf, flags & IS_EXP ? "-> %.*e\n" : "-> %.*f\n", prec, val);
 	return sbuf;
 }
 

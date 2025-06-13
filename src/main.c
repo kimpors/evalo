@@ -16,32 +16,35 @@
 #define MAX 2048
 static char sbuf[MAX];
 
+//extern char *arg_text;
+
 int main(int argc, char *argv[])
 {
-	if (arg_evaluate(argc, argv)) return -1;
+	char *value;
+	FILE *fp = stdin;
+	long double res;
 
-	if (ishelp)
+	if ((value = argeval(argc, argv)) == NULL && flags & IS_ERROR) return -1;
+
+	if (flags & IS_HELP)
 	{
 		help();
 		return 0;
 	}
 
-	long double res;
-	FILE *fp = stdin;
-
-	if (istext)
+	if (flags & IS_TEXT)
 	{
-		if (tokenize(arg_text, TOKEN)) return -2;
-		printf("%s", format(res = evaluate(parse())));
-		if (isclip) clip(res);
+		if (tokenize(value, TOKEN)) return -2;
+		printf("%s", format(res = eval(parse())));
+		if (flags & IS_CLIP) clip(res);
 		return 0;
 	}
 
-	if (isfile)
+	if (flags & IS_FILE)
 	{
-		if (!(fp = fopen(arg_text, "r")))
+		if (!(fp = fopen(value, "r")))
 		{
-			fprintf(stderr, "can't open file: %s\n", arg_text);
+			fprintf(stderr, "can't open file: %s\n", value);
 			exit(-1);
 		}
 	}
@@ -50,9 +53,10 @@ int main(int argc, char *argv[])
 	{
 		if (!tokenize(sbuf, TOKEN))
 		{
-			printf("%s\n", format(res = evaluate(parse())));
-			if (isclip) clip(res);
+			printf("%s\n", format(res = eval(parse())));
+			if (flags & IS_CLIP) clip(res);
 		}
+
 		memset(sbuf, 0, sizeof(sbuf));
 	}
 

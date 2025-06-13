@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <math.h>
 
-#define MAX 2048
-
 Node *create(Token tok);
 
 Node *parse(void)
@@ -23,7 +21,7 @@ Node *parse(void)
 	return node;
 }
 
-double evaluate(Node *root)
+double eval(Node *root)
 {
 	if (!root) return 0;
 
@@ -32,8 +30,8 @@ double evaluate(Node *root)
 		return root->token.num;
 	}
 
-	double left = evaluate(root->left);
-	double right = evaluate(root->right);
+	double left = eval(root->left);
+	double right = eval(root->right);
 
 	switch (root->token.sign)
 	{
@@ -48,11 +46,11 @@ double evaluate(Node *root)
 }
 
 static size_t index;
-static Node buf[MAX];
+static Node buf[TOKEN_MAX];
 
 Node *create(Token tok)
 {
-	if (index > MAX - 1) return NULL;
+	if (index > TOKEN_MAX - 1) return NULL;
 
 	buf[index].token = tok;
 	buf[index].left = NULL;

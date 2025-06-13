@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	}
 
 	tokenize(argv[1], TOKEN);
-	double res = evaluate(parse());
+	double res = eval(parse());
 	double arg = atof(argv[2]);
 
 	if (isinf(res))

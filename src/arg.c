@@ -1,18 +1,89 @@
-#include "arg.h"
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
-bool ishelp = false;
-bool istext = false;
-bool isverb = false;
-bool isfile = false;
-bool isclip = false;
-bool isexp = false;
+#include "arg.h"
+#include "error.h"
 
-char *arg_text = NULL;
+unsigned flags;
 signed char prec = 2;
+
+char *argeval(int argc, char *argv[])
+{
+	char *buf;
+	unsigned char index = 0;
+
+	if (strcmp(*argv, "--help") == 0)
+	{
+		flags |= IS_HELP;
+		return NULL;
+	}
+
+	while (--argc > 0 && *(*++argv) == '-')
+ 	{		
+		while (*++(*argv))
+		{
+			switch(**argv)
+			{
+				case 'c': flags |= IS_CLIP; break;
+				case 'v': flags |= IS_VERB; break;
+				case 'e': flags |= IS_EXP; 	break;
+				case 'h': flags |= IS_HELP; break;
+				case 'f':
+					if (!argv[++index])
+					{
+						ERROR_MSG("empty argument");
+						flags |= IS_ERROR;
+						return NULL;
+					}
+
+					flags |= IS_FILE;
+					buf = argv[index];
+					argc--;
+					break;
+				case 'p':
+					if (!argv[++index])
+					{
+						ERROR_MSG("empty argument");
+						flags |= IS_ERROR;
+						return NULL;
+					}
+
+					prec = atoi(argv[index]);
+
+					if (prec == 0 && (*argv[index] <= '0' || *argv[index] >= '9'))
+					{
+						fprintf(stderr, "argument error: not a number: %s\n", argv[index]);
+						flags |= IS_ERROR;
+						return NULL;
+					}
+
+					if (prec < 0)
+					{
+						fprintf(stderr, "argument error: precision can't be negative number: %s\n", argv[index]);
+						flags |= IS_ERROR;
+						return NULL;
+					}
+
+					argc--;
+					break;
+				default:
+					fprintf(stderr, "argument error: wrong argument: %c\n", **argv);
+					flags |= IS_ERROR;
+					return NULL;
+			}
+		}
+	}
+
+	if (argc > 0)
+	{
+		if ((flags & IS_FILE) == 0) flags |= IS_TEXT;
+		buf = argv[index];
+	}
+
+	return buf;
+}
 
 void help(void)
 {
@@ -36,102 +107,6 @@ void help(void)
 	printf("\tevalo -ecpt 12 \"12 + 22\"\n");
 }
 
-int arg_evaluate(int argc, char *argv[])
-{
-	unsigned char index = 1;
-
-	while (--argc > 0 && *(*++argv) == '-')
- 	{		
-		if (strcmp(*argv, "--help") == 0)
-		{
-			ishelp = true;
-			continue;
-		}
-
-		while (*++(*argv))
-		{
-			switch(**argv)
-			{
-				case 'c':
-					isclip = true;
-					break;
-				case 'v':
-					isverb = true;
-					break;
-				case 'e':
-					isexp = true;
-					break;
-				case 'h':
-					ishelp = true;
-					break;
-				case 't':
-					if (isfile)
-					{
-						fprintf(stderr, "argument error: you can't use both -f and -t options\n");
-						return -1;
-					}
-
-					if (!argv[index])
-					{
-						fprintf(stderr, "argument erro: empty arg\n");
-						return -1;
-					}
-
-					istext = true;
-					arg_text = argv[index++];
-					argc--;
-					break;
-				case 'f':
-					if (istext)
-					{
-						fprintf(stderr, "argument error: you can't use both -f and -t options\n");
-						return -1;
-					}
-
-					if (!argv[index])
-					{
-						fprintf(stderr, "argument erro: empty arg\n");
-						return -1;
-					}
-
-					isfile = true;
-					arg_text = argv[index++];
-					argc--;
-					break;
-				case 'p':
-					if (!argv[index])
-					{
-						fprintf(stderr, "argument erro: empty arg\n");
-						return -1;
-					}
-
-					prec = atoi(argv[index]);
-
-					if (prec == 0 && (*argv[index] <= '0' || *argv[index] >= '9'))
-					{
-						fprintf(stderr, "argument error: not a number: %s\n", argv[index]);
-						return -1;
-					}
-
-					if (prec < 0)
-					{
-						fprintf(stderr, "argument error: precision can't be negative number: %s\n", argv[index]);
-						return -1;
-					}
-
-					index++;
-					argc--;
-					break;
-				default:
-					fprintf(stderr, "argument error: wrong argument: %c\n", **argv);
-					return -1;
-			}
-		}
-	}
-
-	return 0;
-}
-
 #ifdef __linux__
 void clip(double num)
 {
@@ -142,7 +117,7 @@ void clip(double num)
 		return;
 	}
 
-	fprintf(fp, isexp ? "%.*e" : "%.*f", prec, num);
+	fprintf(fp, flags & IS_CLIP ? "%.*e" : "%.*f", prec, num);
 	pclose(fp);
 }
 #elif _WIN32

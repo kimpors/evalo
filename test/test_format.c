@@ -7,14 +7,15 @@
 
 int main(int argc, char *argv[])
 {
-	if (arg_evaluate(argc - 1, argv)) return -1;
-	tokenize(arg_text, TOKEN);
+	char *value;
+	if ((value = argeval(argc - 1, argv)) == NULL) return -1;
+	tokenize(value, TOKEN);
 	char *arg = argv[argc - 1];
-	char *eval = format(evaluate(parse()));
+	char *res = format(eval(parse()));
 
 	printf("arg: %s\n", arg);
-	printf("eval: %s\n", eval);
-	printf("cmp: %d\n", strcmp(eval, "-> 2\n"));
+	printf("eval: %s\n", res);
+	printf("cmp: %d\n", strcmp(res, "-> 2\n"));
 
-	return strcmp(arg, eval);
+	return strcmp(arg, res);
 }
