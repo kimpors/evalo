@@ -1,1 +1,1 @@
-char *format(double val);
+void eprintf(double val);

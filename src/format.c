@@ -1,28 +1,7 @@
 #include "arg.h"
-#include <ctype.h>
 #include <stdio.h>
 
-#define LEN 2048
-static char sbuf[LEN];
-
-char *trim(char *s);
-
-char *format(double val)
+void eprintf(double val)
 {
-	//if (flags & IS_VERB) sprintf(sbuf, flags & IS_EXP ? "%s -> %.*e\n" : "%s -> %.*f\n", arg_text, prec, val);
-	sprintf(sbuf, flags & IS_EXP ? "-> %.*e\n" : "-> %.*f\n", prec, val);
-	return sbuf;
-}
-
-char *trim(char *s)
-{
-	while (isblank(*s)) s++;
-
-	char *ps = s;
-	while (*ps != '\0') ps++;
-	ps--;
-	while (isblank(*ps)) ps--;
-	*ps = '\0';
-
-	return s;
+	printf(flags & IS_EXP ? "-> %.*e\n" : "-> %.*f\n", prec, val);
 }
