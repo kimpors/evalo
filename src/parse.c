@@ -8,7 +8,7 @@ Node *create(Token tok);
 Node *parse(void)
 {
 	Token *tok = NULL;
-	assert((tok = pop()));
+	if (!(tok = pop())) return NULL;
 
 	if (tok->type == NUMBER)
 	{
