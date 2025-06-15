@@ -1,28 +1,40 @@
 #include <stdio.h>
-#include <assert.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "arg.h"
 #include "error.h"
 
 unsigned flags;
 signed char prec = 2;
-// static char *buf = NULL;
 
 char *argeval(int argc, char *argv[])
 {
 	char *buf = NULL;
-	unsigned char index = 0;
+	char **parg = NULL;
 
-	if (argc > 1 && strcmp(*++argv, "--help") == 0)
-	{
-		flags |= IS_HELP;
-		return NULL;
-	}
-
-	while (--argc > 0 && **argv == '-')
+	while (--argc > 0 && (parg = (++argv)))
  	{		
+		if (strcmp(*argv, "--help") == 0)
+		{
+			flags |= IS_HELP;
+			return NULL;
+		}
+
+		if (!flags && **argv != '-')
+		{
+			flags |= IS_TEXT;
+			buf = *argv;
+			continue;
+		}
+		else if (flags && **argv != '-')
+		{
+			fprintf(stderr, "argument error: wrong argument: %s\n", *argv);
+			flags |= IS_ERROR;
+			return NULL;
+		}
+
 		while (*++(*argv))
 		{
 			switch(**argv)
@@ -31,56 +43,43 @@ char *argeval(int argc, char *argv[])
 				case 'v': flags |= IS_VERB; break;
 				case 'e': flags |= IS_EXP; 	break;
 				case 'h': flags |= IS_HELP; break;
-				case 'f':
-					if (!argv[++index])
-					{
-						ERROR_MSG("empty argument");
-						flags |= IS_ERROR;
-						return NULL;
-					}
+				case 'f': 
+						  if (!(*++parg))
+						  {
+								ERROR_MSG("empty argument");
+								flags |= IS_ERROR;
+								return NULL;
+						  }
 
-					flags |= IS_FILE;
-					buf = argv[index];
-					argc--;
-					break;
-				case 'p':
-					if (!argv[++index])
-					{
-						ERROR_MSG("empty argument");
-						flags |= IS_ERROR;
-						return NULL;
-					}
+						  argc--;
+						  buf = *parg;
+						  flags |= IS_FILE;
+						  break;
+				case 'p': 
+						  if (!(*++parg))
+						  {
+								ERROR_MSG("empty argument");
+								flags |= IS_ERROR;
+								return NULL;
+						  }
 
-					prec = atoi(argv[index]);
-
-					if (prec == 0 && (*argv[index] <= '0' || *argv[index] >= '9'))
-					{
-						fprintf(stderr, "argument error: not a number: %s\n", argv[index]);
-						flags |= IS_ERROR;
-						return NULL;
-					}
-
-					if (prec < 0)
-					{
-						fprintf(stderr, "argument error: precision can't be negative number: %s\n", argv[index]);
-						flags |= IS_ERROR;
-						return NULL;
-					}
-
-					argc--;
-					break;
+						  if ((prec = atoi(*parg)) == 0 && !isdigit(parg))
+						  {
+							fprintf(stderr, "argument error: not a number: %s\n", *argv);
+							flags |= IS_ERROR;
+							return NULL;
+						  }
+						  argc--;
+						  break;
 				default:
-					fprintf(stderr, "argument error: wrong argument: %c\n", **argv);
+					fprintf(stderr, "argument error: wrong argument: %c\n", **parg);
+					printf("argv: %s\n", *parg);
 					flags |= IS_ERROR;
 					return NULL;
 			}
 		}
-	}
 
-	if (argc > 0)
-	{
-		if ((flags & IS_FILE) == 0) flags |= IS_TEXT;
-		buf = argv[index];
+		argv = parg;
 	}
 
 	return buf;
@@ -91,7 +90,7 @@ void help(void)
 	printf("Usage:\n\tevalo [args?] [exp?]\n\n");
 
 	printf("Options:\n");
-	printf("\t-p [N]  \tSet precision length to N. Max length is 127\n");
+	printf("\t-p [N]  \tSet precision length to N. It's unsigned variable. Max length is 127.\n");
 	printf("\t-f <file>\tUse file as source\n");
 	printf("\t-e\t\tSet scientific notaion\n");
 	printf("\t-v\t\tShow full equation with answer\n");
