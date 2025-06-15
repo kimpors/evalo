@@ -12,13 +12,14 @@
 #include <winnt.h>
 #endif
 
-#define MAX 2048
-static char sbuf[MAX];
+#define LINE_MAX 2048
+static char sbuf[LINE_MAX];
+extern long double prev_res;
 
 int main(int argc, char *argv[])
 {
-	char *expr = NULL;
 	Token *tok = NULL;
+	char *expr = NULL;
 	FILE *fp = stdin;
 	long double res;
 
@@ -48,11 +49,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	while (fgets(sbuf, MAX, fp))
+	while (fgets(sbuf, LINE_MAX, fp))
 	{
-		if (!(tok = tokenize(sbuf, TOKEN_MAX)))
-		{
-			eprintf(res = eval(parse(tok)));
+		if (!(tok = tokenize(sbuf, TOKEN_MAX))) {
+			eprintf(prev_res = res = eval(parse(tok)));
 			if (flags & IS_CLIP) clip(res);
 		}
 

@@ -1,3 +1,4 @@
+#pragma once
 #define IS_HELP		(1 << 0)
 #define IS_TEXT		(1 << 1)
 #define IS_FILE		(1 << 2)

@@ -17,6 +17,8 @@ char peep_temp(void);
 Token *pop_temp(void);
 int check_sign(char a);
 
+long double prev_res;
+
 char *gettoken(char *s, Token *dest, size_t lim)
 {
 	if (!s) return NULL;
@@ -37,7 +39,7 @@ char *gettoken(char *s, Token *dest, size_t lim)
 	}
 	else if (check_sign(*s))
 	{
-		dest->type = NONE;
+		dest->type = KEYWORD;
 		strcpy(dest->word, s);
 		s++;
 	}
@@ -99,7 +101,7 @@ Token *tokenize(char *s, size_t lim)
 
 			prev = res;
 		}
-		else if (res.type == NONE)
+		else if (res.type == KEYWORD)
 		{
 			if (strcmp(res.word, "quit\n") == 0 ||
 				strcmp(res.word, "q\n") == 0 ||
@@ -107,10 +109,17 @@ Token *tokenize(char *s, size_t lim)
 			{
 				exit(-1);
 			}
-
-			WARN_MSG("can't parse text: '%s'", res.word)
-			clear();
-			return NULL;
+			else if (strcmp(res.word, "prev\n") == 0)
+			{
+				pushn(prev_res);
+				return tok;
+			}
+			else 
+			{
+				WARN_MSG("can't parse text: '%s'", res.word)
+				clear();
+				return NULL;
+			}
 		}
 		else
 		{
@@ -142,7 +151,6 @@ Token *tokenize(char *s, size_t lim)
 	}
 
 	return tok;
-	//return 0;
 }
 
 int check_sign(char a)

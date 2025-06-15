@@ -6,7 +6,6 @@ Node *create(Token tok);
 
 Node *parse(Token *tok)
 {
-	//Token *tok = NULL;
 	if (!(tok = pop())) return NULL;
 
 	if (tok->type == NUMBER)
