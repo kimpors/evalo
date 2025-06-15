@@ -1,7 +1,8 @@
 #include "arg.h"
-#include <stdio.h>
+#include <stdbool.h>
 
 int main(int argc, char *argv[])
 {
-	return (argeval(argc, argv) == NULL && (flags & IS_ERROR) != 0);
+	argeval(argc, argv);
+	return (flags & IS_ERROR);
 }

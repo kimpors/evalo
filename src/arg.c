@@ -42,7 +42,7 @@ char *argeval(int argc, char *argv[])
 				case 'c': flags |= IS_CLIP; break;
 				case 'v': flags |= IS_VERB; break;
 				case 'e': flags |= IS_EXP; 	break;
-				case 'h': flags |= IS_HELP; break;
+				case 'h': flags |= IS_HELP; return NULL;
 				case 'f': 
 						  if (!(*++parg))
 						  {

@@ -8,5 +8,6 @@ typedef struct node {
 	struct node *right;
 } Node;
 
-Node *parse(void);
+//Node *parse(void);
+Node *parse(Token *tok);
 double eval(Node *root);

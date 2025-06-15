@@ -5,9 +5,9 @@
 
 Node *create(Token tok);
 
-Node *parse(void)
+Node *parse(Token *tok)
 {
-	Token *tok = NULL;
+	//Token *tok = NULL;
 	if (!(tok = pop())) return NULL;
 
 	if (tok->type == NUMBER)
@@ -16,8 +16,8 @@ Node *parse(void)
 	}
 
 	Node *node = create(*tok);
-	node->left = parse();
-	node->right = parse();
+	node->left = parse(tok);
+	node->right = parse(tok);
 	return node;
 }
 

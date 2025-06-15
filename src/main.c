@@ -18,6 +18,7 @@ static char sbuf[MAX];
 int main(int argc, char *argv[])
 {
 	char *expr = NULL;
+	Token *tok = NULL;
 	FILE *fp = stdin;
 	long double res;
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
 	if (flags & IS_TEXT)
 	{
 		if (tokenize(expr, TOKEN_MAX)) return -1;
-		eprintf(res = eval(parse()));
+		eprintf(res = eval(parse(tok)));
 		if (flags & IS_CLIP) clip(res);
 		return 0;
 	}
@@ -48,9 +49,9 @@ int main(int argc, char *argv[])
 
 	while (fgets(sbuf, MAX, fp))
 	{
-		if (!tokenize(sbuf, TOKEN_MAX))
+		if (!(tok = tokenize(sbuf, TOKEN_MAX)))
 		{
-			eprintf(res = eval(parse()));
+			eprintf(res = eval(parse(tok)));
 			if (flags & IS_CLIP) clip(res);
 		}
 

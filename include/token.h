@@ -18,4 +18,5 @@ typedef struct {
 } Token;
 
 Token *pop(void);
-int tokenize(char *s, size_t lim);
+Token *tokenize(char *s, size_t lim);
+//int tokenize(char *s, size_t lim);

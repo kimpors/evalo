@@ -53,7 +53,7 @@ char *gettoken(char *s, Token *dest, size_t lim)
 
 // Tokenize word.
 // Produce stack of tokens
-int tokenize(char *s, size_t lim)
+Token *tokenize(char *s, size_t lim)
 {
 	assert(s || *s);
 
@@ -70,7 +70,8 @@ int tokenize(char *s, size_t lim)
 			{
 				ERROR_MSG("'%.2f' can't be after '%.2f'", res.num, prev.num);
 				clear();
-				return -1;
+				return NULL;
+				//return -1;
 			}
 
 			pushn(res.num);
@@ -82,7 +83,8 @@ int tokenize(char *s, size_t lim)
 			{
 				ERROR_MSG("'%c' can't be after '%.2f'", res.sign, prev.num);
 				clear();
-				return -1;
+				return NULL;
+				//return -1;
 			}
 
 			if (res.sign == '(')
@@ -110,7 +112,8 @@ int tokenize(char *s, size_t lim)
 
 			ERROR_MSG("can't parse text: '%s'", res.word)
 			clear();
-			return -1;
+			return NULL;
+			//return -1;
 		}
 		else
 		{
@@ -118,7 +121,8 @@ int tokenize(char *s, size_t lim)
 			{
 				ERROR_MSG("'%c' can't be after '%c'", res.sign, prev.sign);
 				clear();
-				return -1;
+				return NULL;
+				//return -1;
 			}
 
 			if (signcmp(peep_temp(), res.sign) > 0)
@@ -141,7 +145,8 @@ int tokenize(char *s, size_t lim)
 		pusht(tok);
 	}
 
-	return 0;
+	return tok;
+	//return 0;
 }
 
 int check_sign(char a)

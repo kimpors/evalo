@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	tokenize(argv[1], TOKEN_MAX);
-	double res = eval(parse());
+	Token *tok = tokenize(argv[1], TOKEN_MAX);
+	double res = eval(parse(tok));
 	double arg = atof(argv[2]);
 
 	if (isinf(res))
