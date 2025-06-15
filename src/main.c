@@ -1,11 +1,11 @@
+#include <stdio.h>
+#include <string.h>
+
 #include "format.h"
 #include "parse.h"
 #include "error.h"
 #include "token.h"
 #include "arg.h"
-
-#include <stdio.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
 		if (!(fp = fopen(expr, "r")))
 		{
 			ERROR_MSG("can't open file: '%s'", expr);
-			exit(-1);
+			fclose(fp);
+			return -1;
 		}
 	}
 

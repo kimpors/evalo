@@ -1,10 +1,10 @@
-#include "token.h"
-#include "error.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+
+#include "token.h"
+#include "error.h"
 
 int signcmp(char a, char b);
 
@@ -68,10 +68,9 @@ Token *tokenize(char *s, size_t lim)
 		{
 			if (prev.type == NUMBER)
 			{
-				ERROR_MSG("'%.2f' can't be after '%.2f'", res.num, prev.num);
+				WARN_MSG("'%.2f' can't be after '%.2f'", res.num, prev.num);
 				clear();
 				return NULL;
-				//return -1;
 			}
 
 			pushn(res.num);
@@ -81,10 +80,9 @@ Token *tokenize(char *s, size_t lim)
 		{
 			if (prev.type == NUMBER && res.sign == '(')
 			{
-				ERROR_MSG("'%c' can't be after '%.2f'", res.sign, prev.num);
+				WARN_MSG("'%c' can't be after '%.2f'", res.sign, prev.num);
 				clear();
 				return NULL;
-				//return -1;
 			}
 
 			if (res.sign == '(')
@@ -110,19 +108,17 @@ Token *tokenize(char *s, size_t lim)
 				exit(-1);
 			}
 
-			ERROR_MSG("can't parse text: '%s'", res.word)
+			WARN_MSG("can't parse text: '%s'", res.word)
 			clear();
 			return NULL;
-			//return -1;
 		}
 		else
 		{
 			if (prev.type == SIGN)
 			{
-				ERROR_MSG("'%c' can't be after '%c'", res.sign, prev.sign);
+				WARN_MSG("'%c' can't be after '%c'", res.sign, prev.sign);
 				clear();
 				return NULL;
-				//return -1;
 			}
 
 			if (signcmp(peep_temp(), res.sign) > 0)

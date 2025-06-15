@@ -1,5 +1,5 @@
-#include "arg.h"
 #include <stdio.h>
+#include "arg.h"
 
 void eprintf(double val)
 {

@@ -1,7 +1,6 @@
-#include "parse.h"
 #include <stdio.h>
-#include <assert.h>
 #include <math.h>
+#include "parse.h"
 
 Node *create(Token tok);
 
