@@ -1,4 +1,6 @@
 #include "token.h"
+#include "error.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -66,7 +68,7 @@ int tokenize(char *s, size_t lim)
 		{
 			if (prev.type == NUMBER)
 			{
-				fprintf(stderr, "format error: '%.2f' can't be after '%.2f'\n", res.num, prev.num);
+				ERROR_MSG("'%.2f' can't be after '%.2f'", res.num, prev.num);
 				clear();
 				return -1;
 			}
@@ -78,7 +80,7 @@ int tokenize(char *s, size_t lim)
 		{
 			if (prev.type == NUMBER && res.sign == '(')
 			{
-				fprintf(stderr, "format error: '%c' can't be after '%.2f'\n", res.sign, prev.num);
+				ERROR_MSG("'%c' can't be after '%.2f'", res.sign, prev.num);
 				clear();
 				return -1;
 			}
@@ -106,7 +108,7 @@ int tokenize(char *s, size_t lim)
 				exit(-1);
 			}
 
-			fprintf(stderr, "format error: can't parse text: %s\n", res.word);
+			ERROR_MSG("can't parse text: '%s'", res.word)
 			clear();
 			return -1;
 		}
@@ -114,7 +116,7 @@ int tokenize(char *s, size_t lim)
 		{
 			if (prev.type == SIGN)
 			{
-				fprintf(stderr, "format error: '%c' can't be after '%c'\n", res.sign, prev.sign);
+				ERROR_MSG("'%c' can't be after '%c'", res.sign, prev.sign);
 				clear();
 				return -1;
 			}

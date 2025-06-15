@@ -1,6 +1,7 @@
-#include "token.h"
-#include "parse.h"
 #include "format.h"
+#include "parse.h"
+#include "error.h"
+#include "token.h"
 #include "arg.h"
 
 #include <stdio.h>
@@ -16,11 +17,11 @@ static char sbuf[MAX];
 
 int main(int argc, char *argv[])
 {
-	char *expr;
+	char *expr = NULL;
 	FILE *fp = stdin;
 	long double res;
 
-	if ((expr = argeval(argc, argv)) == NULL && flags & IS_ERROR) return -1;
+	if (!(expr = argeval(argc, argv)) && flags & IS_ERROR) return -1;
 
 	if (flags & IS_HELP)
 	{
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 	{
 		if (!(fp = fopen(expr, "r")))
 		{
-			fprintf(stderr, "can't open file: %s\n", expr);
+			ERROR_MSG("can't open file: '%s'", expr);
 			exit(-1);
 		}
 	}

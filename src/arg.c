@@ -30,7 +30,7 @@ char *argeval(int argc, char *argv[])
 		}
 		else if (flags && **argv != '-')
 		{
-			fprintf(stderr, "argument error: wrong argument: %s\n", *argv);
+			ERROR_MSG("wrong argument '%s'", *argv);
 			flags |= IS_ERROR;
 			return NULL;
 		}
@@ -46,9 +46,9 @@ char *argeval(int argc, char *argv[])
 				case 'f': 
 						  if (!(*++parg))
 						  {
-								ERROR_MSG("empty argument");
-								flags |= IS_ERROR;
-								return NULL;
+							  ERROR_MSG("empty argument (supply path to file)");
+							  flags |= IS_ERROR;
+							  return NULL;
 						  }
 
 						  argc--;
@@ -58,24 +58,24 @@ char *argeval(int argc, char *argv[])
 				case 'p': 
 						  if (!(*++parg))
 						  {
-								ERROR_MSG("empty argument");
-								flags |= IS_ERROR;
-								return NULL;
+							  ERROR_MSG("empty argument (supply number for precision)");
+							  flags |= IS_ERROR;
+							  return NULL;
 						  }
 
-						  if ((prec = atoi(*parg)) == 0 && !isdigit(parg))
+						  if (!(prec = atoi(*parg)) && !isdigit(**parg))
 						  {
-							fprintf(stderr, "argument error: not a number: %s\n", *argv);
-							flags |= IS_ERROR;
-							return NULL;
+							  ERROR_MSG("not a number: '%s'", *parg);
+							  flags |= IS_ERROR;
+							  return NULL;
 						  }
+						  printf("%s", *parg);
 						  argc--;
 						  break;
 				default:
-					fprintf(stderr, "argument error: wrong argument: %c\n", **parg);
-					printf("argv: %s\n", *parg);
-					flags |= IS_ERROR;
-					return NULL;
+						  ERROR_MSG("wrong argument: '%c'", **parg);
+						  flags |= IS_ERROR;
+						  return NULL;
 			}
 		}
 
@@ -112,7 +112,7 @@ void clip(double num)
 	FILE *fp = popen("xclip -selection clipboard", "w");
 	if (!fp)
 	{
-		fprintf(stderr, "failed to open xlip\n");
+		ERROR_MSG("failed to open xclip");
 		return;
 	}
 
@@ -128,7 +128,7 @@ void clip(double num)
 
 	if (!OpenClipboard(NULL))
 	{
-		fprintf(stderr, "Failed to open clipboard\n");
+		ERROR_MSG("failed to open clipboard");
 		exit(-1);
 	}
 
@@ -140,7 +140,7 @@ void clip(double num)
 	if (!hMem)
 	{
 		CloseClipboard();
-		fprintf(stderr, "Failed to allocate memory\n");
+		ERROR_MSG("failed to allocate memory");
 		exit(-2);
 	}
 
