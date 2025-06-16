@@ -14,7 +14,6 @@
 
 #define LINE_MAX 2048
 static char sbuf[LINE_MAX];
-extern long double prev_res;
 
 int main(int argc, char *argv[])
 {
@@ -52,7 +51,7 @@ int main(int argc, char *argv[])
 	while (fgets(sbuf, LINE_MAX, fp))
 	{
 		if (!(tok = tokenize(sbuf, TOKEN_MAX))) {
-			eprintf(prev_res = res = eval(parse(tok)));
+			eprintf(res = eval(parse(tok)));
 			if (flags & IS_CLIP) clip(res);
 		}
 

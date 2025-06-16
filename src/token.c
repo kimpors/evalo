@@ -3,6 +3,12 @@
 #include <assert.h>
 #include <ctype.h>
 
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
+
+#include <math.h>
+
 #include "token.h"
 #include "error.h"
 
@@ -16,11 +22,6 @@ void push_temp(char ch);
 char peep_temp(void);
 Token *pop_temp(void);
 int isign(char a);
-
-long double lookup(char *s);
-void install(char *s, long double value);
-
-long double prev_res;
 
 char *gettoken(char *s, Token *dest, size_t lim)
 {
@@ -49,10 +50,15 @@ char *gettoken(char *s, Token *dest, size_t lim)
 	else 
 	{
 		char *ps = s;
-		while (lim-- > 0 && isalpha(*++s));
-		dest->type = VARIABLE;
-		strncpy(dest->word, ps, s - ps);
-		dest->word[s - ps + 1] = '\0';
+		while (lim-- > 0 && isalpha(*s))
+		{
+			dest->word[s - ps] = *s;
+			s++;
+		}
+
+		dest->word[s - ps] = '\0';
+		dest->type = clookup(dest->word)
+			? CONSTANT : VARIABLE;
 	}
 
 	return s;
@@ -106,7 +112,7 @@ Token *tokenize(char *s, size_t lim)
 
 			prev = res;
 		}
-		else if (res.type == VARIABLE)
+		else if (res.type == VARIABLE || res.type == CONSTANT)
 		{
 			pusht(&res);
 			prev = res;
@@ -252,19 +258,29 @@ void clear(void)
 	memset(temp, 0, sizeof(temp));
 }
 
-#define HASH 1024
-static long double vars[HASH] = {0};
+#define HASH 4096
+static long double vars[HASH];
+static long double cons[HASH];
 
 unsigned hash(char *s)
 {
-	unsigned val = 1;
+	unsigned long hash = 5381;
+	int c;
 
-	while (*s++)
+	while ((c = *s++))
 	{
-		val = *s + 31 * val;
+		hash = ((hash << 5) + hash) + c;
 	}
 
-	return val % HASH;
+	return hash % HASH;
+}
+
+void init_cons(void)
+{
+	cons[hash("pi")] = M_PI;
+	cons[hash("e")] = M_E;
+	cons[hash("inf")] = INFINITY;
+	cons[hash("nan")] = NAN;
 }
 
 void install(char *s, long double value)
@@ -275,4 +291,10 @@ void install(char *s, long double value)
 long double lookup(char *s)
 {
 	return vars[hash(s)];
+}
+
+long double clookup(char *s)
+{
+	if (!cons[hash(s)]) init_cons();
+	return cons[hash(s)];
 }

@@ -5,7 +5,7 @@
 #define TOKEN_MAX 	512
 
 typedef enum {
-	NONE, NUMBER, SIGN, BRACKET, KEYWORD, VARIABLE
+	NONE, NUMBER, SIGN, BRACKET, VARIABLE, CONSTANT
 } TokenTypeE;
 
 typedef struct {
@@ -21,4 +21,5 @@ Token *pop(void);
 Token *tokenize(char *s, size_t lim);
 
 long double lookup(char *s);
+long double clookup(char *s);
 void install(char *s, long double value);

@@ -10,7 +10,9 @@ Node *parse(Token *tok)
 {
 	if (!(tok = pop())) return NULL;
 
-	if (tok->type == NUMBER || tok->type == VARIABLE)
+	if (tok->type == NUMBER 	||
+		tok->type == CONSTANT	||
+		tok->type == VARIABLE)
 	{
 		return create(*tok);
 	}
@@ -25,19 +27,21 @@ double eval(Node *root)
 {
 	if (!root) return 0;
 
-	if (root->token.type == NUMBER)
+	Token tok;
+	double left, right;
+
+	switch ((tok = root->token).type)
 	{
-		return root->token.num;
-	}
-	else if (root->token.type == VARIABLE)
-	{
-		return lookup(root->token.word);
+		case NUMBER: 	return tok.num;
+		case CONSTANT: 	return clookup(tok.word);
+		case VARIABLE:	return lookup(tok.word);
+		default:
+						left = eval(root->left);
+						right = eval(root->right);
+						break;
 	}
 
-	double left = eval(root->left);
-	double right = eval(root->right);
-
-	switch (root->token.sign)
+	switch (tok.sign)
 	{
 		case '+': return left + right;
 		case '-': return right - left;
@@ -45,19 +49,21 @@ double eval(Node *root)
 		case '/': return right / left;
 		case '^': return pow(right, left);
 		case '=': 
-				  if (root->right->token.type != VARIABLE)
+				  tok = root->right->token;
+				  if (tok.type != VARIABLE)
 				  {
 					  WARN_MSG("left side doesn't contain variable type");
 					  return 0;
 				  }
 
-				  install(root->right->token.word, left);
-				  return lookup(root->right->token.word);
+				  install(tok.word, left);
+				  return lookup(tok.word);
 	}
 
 	return -1;
 }
 
+// struct node_
 static size_t index;
 static Node buf[NODE_MAX];
 
