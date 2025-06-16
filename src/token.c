@@ -15,7 +15,10 @@ void clear(void);
 void push_temp(char ch);
 char peep_temp(void);
 Token *pop_temp(void);
-int check_sign(char a);
+int isign(char a);
+
+long double lookup(char *s);
+void install(char *s, long double value);
 
 long double prev_res;
 
@@ -37,17 +40,19 @@ char *gettoken(char *s, Token *dest, size_t lim)
 		dest->type = NUMBER;
 		dest->num = strtod(s, &s);
 	}
-	else if (check_sign(*s))
-	{
-		dest->type = KEYWORD;
-		strcpy(dest->word, s);
-		s++;
-	}
-	else
+	else if (isign(*s))
 	{
 		dest->type = SIGN;
 		dest->sign = *s;
 		s++;
+	}
+	else 
+	{
+		char *ps = s;
+		while (lim-- > 0 && isalpha(*++s));
+		dest->type = VARIABLE;
+		strncpy(dest->word, ps, s - ps);
+		dest->word[s - ps + 1] = '\0';
 	}
 
 	return s;
@@ -101,27 +106,12 @@ Token *tokenize(char *s, size_t lim)
 
 			prev = res;
 		}
-		else if (res.type == KEYWORD)
+		else if (res.type == VARIABLE)
 		{
-			if (strcmp(res.word, "quit\n") == 0 ||
-				strcmp(res.word, "q\n") == 0 ||
-				strcmp(res.word, "exit\n") == 0 )
-			{
-				exit(-1);
-			}
-			else if (strcmp(res.word, "prev\n") == 0)
-			{
-				pushn(prev_res);
-				return tok;
-			}
-			else 
-			{
-				WARN_MSG("can't parse text: '%s'", res.word)
-				clear();
-				return NULL;
-			}
+			pusht(&res);
+			prev = res;
 		}
-		else
+		else if (res.type == SIGN)
 		{
 			if (prev.type == SIGN)
 			{
@@ -153,23 +143,24 @@ Token *tokenize(char *s, size_t lim)
 	return tok;
 }
 
-int check_sign(char a)
+int isign(char a)
 {
 	switch(a)
 	{
 		case '+': case '-':
 		case '*': case '/':
-		case '^':
-			return 0;
+		case '^': case '=':
+			return 1;
 	}
 
-	return -1;
+	return 0;
 }
 
-int sign_priority(char a)
+int signprior(char a)
 {
 	switch (a)
 	{
+		case '=':
 		case '+':
 		case '-':
 			return 0;
@@ -185,7 +176,7 @@ int sign_priority(char a)
 // Compare sign priority.
 inline int signcmp(char a, char b)
 {
-	return sign_priority(a) - sign_priority(b);
+	return signprior(a) - signprior(b);
 }
 
 static size_t oindex;
@@ -211,6 +202,10 @@ void pusht(Token *tok)
 	if (tok->type == SIGN)
 	{
 		out[oindex++].sign = tok->sign;
+	}
+	else if (tok->type == VARIABLE)
+	{
+		strcpy(out[oindex++].word, tok->word);
 	}
 	else
 	{
@@ -248,8 +243,36 @@ Token *pop_temp(void)
 }
 
 // Clear all buffers
-inline void clear(void)
+void clear(void)
 {
-	while (pop());
-	while (pop_temp());
+	oindex = 0;
+	tindex = 0;
+
+	memset(out, 0, sizeof(out));
+	memset(temp, 0, sizeof(temp));
+}
+
+#define HASH 1024
+static long double vars[HASH] = {0};
+
+unsigned hash(char *s)
+{
+	unsigned val = 1;
+
+	while (*s++)
+	{
+		val = *s + 31 * val;
+	}
+
+	return val % HASH;
+}
+
+void install(char *s, long double value)
+{
+	vars[hash(s)] = value;
+}
+
+long double lookup(char *s)
+{
+	return vars[hash(s)];
 }

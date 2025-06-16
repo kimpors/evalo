@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include "parse.h"
+#include "error.h"
+#include "token.h"
 
 Node *create(Token tok);
 
@@ -8,7 +10,7 @@ Node *parse(Token *tok)
 {
 	if (!(tok = pop())) return NULL;
 
-	if (tok->type == NUMBER)
+	if (tok->type == NUMBER || tok->type == VARIABLE)
 	{
 		return create(*tok);
 	}
@@ -27,6 +29,10 @@ double eval(Node *root)
 	{
 		return root->token.num;
 	}
+	else if (root->token.type == VARIABLE)
+	{
+		return lookup(root->token.word);
+	}
 
 	double left = eval(root->left);
 	double right = eval(root->right);
@@ -38,6 +44,15 @@ double eval(Node *root)
 		case '*': return left * right;
 		case '/': return right / left;
 		case '^': return pow(right, left);
+		case '=': 
+				  if (root->right->token.type != VARIABLE)
+				  {
+					  WARN_MSG("left side doesn't contain variable type");
+					  return 0;
+				  }
+
+				  install(root->right->token.word, left);
+				  return lookup(root->right->token.word);
 	}
 
 	return -1;

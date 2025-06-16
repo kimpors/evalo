@@ -19,3 +19,6 @@ typedef struct {
 
 Token *pop(void);
 Token *tokenize(char *s, size_t lim);
+
+long double lookup(char *s);
+void install(char *s, long double value);
