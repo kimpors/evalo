@@ -22,23 +22,23 @@ int main(int argc, char *argv[])
 	FILE *fp = stdin;
 	long double res;
 
-	if (!(expr = argeval(argc, argv)) && flags & IS_ERROR) return -1;
+	if (!(expr = argeval(argc, argv)) && flags & ARG_ERROR) return -1;
 
-	if (flags & IS_HELP)
+	if (flags & ARG_HELP)
 	{
 		help();
 		return 0;
 	}
 
-	if (flags & IS_TEXT)
+	if (flags & ARG_TEXT)
 	{
 		if (tokenize(expr, TOKEN_MAX)) return -1;
 		eprintf(res = eval(parse(tok)));
-		if (flags & IS_CLIP) clip(res);
+		if (flags & ARG_CLIP) clip(res);
 		return 0;
 	}
 
-	if (flags & IS_FILE)
+	if (flags & ARG_FILE)
 	{
 		if (!(fp = fopen(expr, "r")))
 		{
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	{
 		if (!(tok = tokenize(sbuf, TOKEN_MAX))) {
 			eprintf(res = eval(parse(tok)));
-			if (flags & IS_CLIP) clip(res);
+			if (flags & ARG_CLIP) clip(res);
 		}
 
 		memset(sbuf, 0, sizeof(sbuf));

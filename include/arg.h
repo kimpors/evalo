@@ -1,11 +1,11 @@
 #pragma once
-#define IS_HELP		(1 << 0)
-#define IS_TEXT		(1 << 1)
-#define IS_FILE		(1 << 2)
-#define IS_VERB		(1 << 3)
-#define IS_CLIP		(1 << 4)
-#define IS_EXP		(1 << 5)
-#define IS_ERROR 	(1 << 6)
+#define ARG_HELP	(1 << 0)
+#define ARG_TEXT	(1 << 1)
+#define ARG_FILE	(1 << 2)
+#define ARG_VERB	(1 << 3)
+#define ARG_CLIP	(1 << 4)
+#define ARG_EXP		(1 << 5)
+#define ARG_ERROR 	(1 << 6)
 
 extern unsigned flags;
 extern signed char prec;

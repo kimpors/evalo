@@ -30,7 +30,7 @@ cmake -B build && cmake --build build
 ## How Install
 
 ```
-cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build && sudo cmake --install build
+cmake -B build && cmake --build build --config Release && sudo cmake --install build
 ```
   
 ## Contribution

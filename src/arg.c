@@ -18,20 +18,20 @@ char *argeval(int argc, char *argv[])
  	{		
 		if (strcmp(*argv, "--help") == 0)
 		{
-			flags |= IS_HELP;
+			flags |= ARG_HELP;
 			return NULL;
 		}
 
 		if (!flags && **argv != '-')
 		{
-			flags |= IS_TEXT;
+			flags |= ARG_TEXT;
 			buf = *argv;
 			continue;
 		}
 		else if (flags && **argv != '-')
 		{
 			ERROR_MSG("wrong argument '%s'", *argv);
-			flags |= IS_ERROR;
+			flags |= ARG_ERROR;
 			return NULL;
 		}
 
@@ -39,34 +39,34 @@ char *argeval(int argc, char *argv[])
 		{
 			switch(**argv)
 			{
-				case 'c': flags |= IS_CLIP; break;
-				case 'v': flags |= IS_VERB; break;
-				case 'e': flags |= IS_EXP; 	break;
-				case 'h': flags |= IS_HELP; return NULL;
+				case 'c': flags |= ARG_CLIP; 	break;
+				case 'v': flags |= ARG_VERB; 	break;
+				case 'e': flags |= ARG_EXP; 	break;
+				case 'h': flags |= ARG_HELP; 	return NULL;
 				case 'f': 
 						  if (!(*++parg))
 						  {
 							  ERROR_MSG("empty argument (supply path to file)");
-							  flags |= IS_ERROR;
+							  flags |= ARG_ERROR;
 							  return NULL;
 						  }
 
 						  argc--;
 						  buf = *parg;
-						  flags |= IS_FILE;
+						  flags |= ARG_FILE;
 						  break;
 				case 'p': 
 						  if (!(*++parg))
 						  {
 							  ERROR_MSG("empty argument (supply number for precision)");
-							  flags |= IS_ERROR;
+							  flags |= ARG_ERROR;
 							  return NULL;
 						  }
 
 						  if (!(prec = atoi(*parg)) && !isdigit(**parg))
 						  {
 							  ERROR_MSG("not a number: '%s'", *parg);
-							  flags |= IS_ERROR;
+							  flags |= ARG_ERROR;
 							  return NULL;
 						  }
 						  printf("%s", *parg);
@@ -74,7 +74,7 @@ char *argeval(int argc, char *argv[])
 						  break;
 				default:
 						  ERROR_MSG("wrong argument: '%c'", **parg);
-						  flags |= IS_ERROR;
+						  flags |= ARG_ERROR;
 						  return NULL;
 			}
 		}
@@ -116,7 +116,7 @@ void clip(double num)
 		return;
 	}
 
-	fprintf(fp, flags & IS_CLIP ? "%.*e" : "%.*f", prec, num);
+	fprintf(fp, flags & ARG_CLIP ? "%.*e" : "%.*f", prec, num);
 	pclose(fp);
 }
 #elif _WIN32

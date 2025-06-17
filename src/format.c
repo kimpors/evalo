@@ -3,5 +3,5 @@
 
 void eprintf(double val)
 {
-	printf(flags & IS_EXP ? "-> %.*e\n" : "-> %.*f\n", prec, val);
+	printf(flags & ARG_EXP ? "-> %.*e\n" : "-> %.*f\n", prec, val);
 }

@@ -4,5 +4,5 @@
 int main(int argc, char *argv[])
 {
 	argeval(argc, argv);
-	return (flags & IS_ERROR);
+	return (flags & ARG_ERROR);
 }
